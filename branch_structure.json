@@ -1,0 +1,21 @@
+{
+  "default_branch": "main",
+  "branches": [
+    "fix/issue-372-docs-devx-explain-the-ci-tier-matrix-and-how-to",
+    "fix/issue-410-test-ui-cover-xmtp-chat-thread-sorting-and",
+    "main",
+    "origin"
+  ],
+  "parent": {
+    "fix/issue-372-docs-devx-explain-the-ci-tier-matrix-and-how-to": "main",
+    "fix/issue-410-test-ui-cover-xmtp-chat-thread-sorting-and": "main",
+    "main": null,
+    "origin": "main"
+  },
+  "order": [
+    "main",
+    "fix/issue-372-docs-devx-explain-the-ci-tier-matrix-and-how-to",
+    "fix/issue-410-test-ui-cover-xmtp-chat-thread-sorting-and",
+    "origin"
+  ]
+}
