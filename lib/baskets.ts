@@ -160,9 +160,9 @@ export function parsePerMarketUsdc(raw: string): PerMarketParseResult {
  *
  * Kept here (the pure computation module, no server-only dependency) so that
  * tests and non-server code can verify the curated-basket guard without pulling
- * in lib/server/basket-directory which carries `import "server-only"".
+ * in lib/server/basket-directory which carries `import "server-only"`.
  *
- * This list must stay in sync with BASKT
+ * This list must stay in sync with the basket directory.
  */
 export const CURATED_BASKET_IDS: readonly string[] = [];
 
@@ -186,7 +186,10 @@ export interface NavMember {
   mode: string;
   paused?: boolean;
   stale?: boolean;
+  /** Per-period returns for this member, as decimals (e.g. 0.01 = +1%). */
+  returns: number[];
 }
+
 export interface BasketReturnPoint { timestamp: number; returnsBps: Record<string, number> }
 export interface BasketPolicy { maxSingleAgentBps: number; maxCategoryBps: number; staleSignalAction: "skip" | "pause"; failedCopyAction: "keep_idle" | "pause" }
 export interface BasketSnapshot { timestamp: number; navAtomic: bigint; drawdownBps: number }
@@ -219,10 +222,6 @@ export interface BasketExposurePreview {
   agentBars: BasketExposureBar[];
   errors: string[];
   policy: BasketPolicy;
-}
-
-  /** Per-period returns for this member, as decimals (e.g. 0.01 = +1%). */
-  returns: number[];
 }
 
 /**
@@ -326,16 +325,9 @@ export function dailyReturnPoints(results: readonly BasketAgentResult[]): Basket
   for (const [day, agents] of [...byDay.entries()].sort((a, b) => a[0] - b[0])) {
     const returnsBps: Record<string, number> = {};
     for (const [agentId, { pnl, stake }] of agents) {
-      if (stake <= 0n) continue;
-      returnsBps[agentId] = Number((pnl * 10_000n ) / stake);
+      returnsBps[agentId] = Number((pnl * 10_000n) / stake);
     }
     points.push({ timestamp: day, returnsBps });
   }
   return points;
-}
-
-function completeSeries(members: readonly NavMember[], periods: number): boolean {
-  return members.every((m) =>
-    m.returns.slice(0, periods).every((r) => Number.isFinite(r)),
-  );
 }
